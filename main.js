@@ -1,4 +1,4 @@
-import { YouTubeAPI } from "./YouTubeAPI.mjs"
+import { YouTubeAPI, YouTubeVideo } from "./YouTubeAPI.mjs"
 
 const docTitle = document.getElementById('name')
 const webLink = document.getElementById('link')
@@ -26,8 +26,8 @@ const setListener = (element, type, handler) => {
 // Получение информации о видео
 
 
-setListener(getVideo, 'click', () => {
-    youtube.getVideoDetails(webLink.textContent.replace('https://www.youtube.com/watch?v='))
+setListener(getVideo, 'click', async () => {
+    youtube.getVideoDetails(webLink.value.replace('https://www.youtube.com/watch?v=', ''))
     .then(video => {
         console.log(video);
     })
@@ -38,13 +38,14 @@ setListener(getVideo, 'click', () => {
 
 // Поиск видео на YouTube с фильтрами
 const filters = {
-  orderBy: "viewCount",
-  publishedAfter: "2022-01-01T00:00:00Z",
-  videoDefinition: "high"
+    type: "video",
+    orderBy: "viewCount",
+    videoDefinition: "high",
+    videoEmbeddable: "true"
 };
 
-setListener(searchButton, 'click', () => {
-    youtube.searchVideosWithFilters("JavaScript tutorial", 1, filters)
+setListener(searchButton, 'click', async () => {
+    youtube.searchVideosWithFilters("JavaScript_tutorial", 5, filters)
     .then(videos => {
     console.log(videos);
     })
@@ -52,5 +53,3 @@ setListener(searchButton, 'click', () => {
     console.error(error);
     });
 })
-
-
