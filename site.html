@@ -11,19 +11,30 @@
        padding: 5px; /* Поля вокруг текста */
        border: 1px solid #000; /* Рамка вокруг ячеек */
       }
+      IMG {
+        width: 50%; /* Ширина */
+        float: left; /* Выстраиваем элементы по горизонтали */
+        margin: 0 0 0 3.5%; /* Отступ слева */
+        background: #f0f0f0; /* Цвет фона */
+        border-radius: 5px; /* Радиус скругления */
+        padding: 2%; /* Поля */
+      }
      </style>
   </head>
   <body>
     <div id="userName"></div>
     <form>
-        <input type="text" id="link" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+        <input type="text" id="link" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ" size="50">
         <input type="button" id="get_video" value="get_info">
-        <input type="button" id="search_button" value="Search">
+        <table id="videoInfo"></table>
     </form>
     <form>
       <table id="videos"></table>
-      <table id="searchData"></table>
-      <table id="videoInfo"></table>
+      <table id="searchData">
+        <input type="text" id="query" value='' size="50">
+        <input type="button" id="search_button" value="Search">
+        <button type="button" id="addButton">Добавить</button>
+      </table>
     </form>
     <script src="./dist/bundle.js"></script>
   </body>

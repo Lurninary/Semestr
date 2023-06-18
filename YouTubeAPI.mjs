@@ -1,13 +1,18 @@
 class YouTubeVideo {
-    constructor(id, title, author, views, duration, preview, upload)
+    constructor(id, title, author, preview, upload, views, duration)
     {
         this.id = id
         this.title = title
         this.author = author
         this.preview = preview
+        this.upload = upload
         this.views = views
         this.duration = duration
-        this.upload = upload
+    }
+
+    static searchConstructor(id, title, author, preview, upload)
+    {
+        return new YouTubeVideo(id, title, author, preview, upload, "", "")
     }
 }
 
@@ -15,8 +20,6 @@ class YouTubeAPI {
     constructor(apiKey) {
         this.apiKey = apiKey;
     }
-
-    
 
     getVideoDetails(videoId) {
         const url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails,id&id=${videoId}&key=${this.apiKey}`;
@@ -26,13 +29,13 @@ class YouTubeAPI {
         .then(response => response.json())
         .then(data => {
             DataArray.push(new YouTubeVideo(
-            data.items[0].id.videoId,
+            data.items[0].id,
             data.items[0].snippet.title,
             data.items[0].snippet.channelTitle,
+            data.items[0].snippet.thumbnails.high.url,
+            data.items[0].snippet.publishedAt,
             data.items[0].statistics.viewCount,
-            data.items[0].contentDetails.duration,
-            data.items[0].snippet.thumbnails.medium.url,
-            data.items[0].snippet.publishedAt
+            data.items[0].contentDetails.duration
             ))
         return DataArray;
         });
@@ -60,13 +63,11 @@ class YouTubeAPI {
         .then(response => response.json())
         .then(data => {
             for(let i=0; i<data.items.length; i++){
-                DataArray.push(new YouTubeVideo(
+                DataArray.push(YouTubeVideo.searchConstructor(
                 data.items[i].id.videoId,
                 data.items[i].snippet.title,
                 data.items[i].snippet.channelTitle,
-                null,
-                null,
-                data.items[i].snippet.thumbnails.medium.url,
+                data.items[i].snippet.thumbnails.high.url,
                 data.items[i].snippet.publishedAt
                 ))
             }
