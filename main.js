@@ -11,6 +11,8 @@ const docTitle = document.getElementById('userName')
 const webLink = document.getElementById('link')
 const searchButton = document.getElementById('search_button')
 const getVideo = document.getElementById('get_video')
+const deleteVideo = document.getElementById('deleteButton')
+const query = document.getElementById("query")
 const addButton = document.getElementById('addButton')
 
 let name = prompt("Привет! Как вас зовут?")
@@ -38,9 +40,12 @@ function renderTable(data, table)
                     column.textContent = video[item] 
                 }else
                 {
+                    let link = document.createElement("a")
+                    link.href = 'https://www.youtube.com/watch?v=' + video.id
                     let image = document.createElement("img")
                     image.src = video[item]
-                    column.appendChild(image)
+                    link.appendChild(image)
+                    column.appendChild(link)
                 }
                 row.appendChild(column)
             }
@@ -78,7 +83,7 @@ const setListener = (element, type, handler) => {
     
 }
 
-function selectRows() {
+function selectRows(tableId) {
     let selectedRows = []
     for (let item of document.querySelectorAll('tr'))
     {
@@ -93,13 +98,17 @@ setListener(addButton, 'click', async () => {
     console.log('Add')
     for (let item of selectRows())
     {
-        let searchId = searchData[item.rowIndex].id
-        youtube.getVideoDetails(searchId)
-        .then(video => {
-            console.log(video)
-            videosData.push(video[0])
-            renderTable(videosData, videosTable)
-        })
+        if (item.className == "searchData")
+        {
+            let searchId = searchData[item.rowIndex].id
+            youtube.getVideoDetails(searchId)
+            .then(video => {
+                console.log(video)
+                videosData.push(video[0])
+                renderTable(videosData, videosTable)
+            })
+            item.click()
+        }
     }
 });
 
@@ -107,10 +116,33 @@ setListener(getVideo, 'click', async () => {
     youtube.getVideoDetails(webLink.value.replace('https://www.youtube.com/watch?v=', ''))
     .then(video => {
         console.log(video);
+        renderTable(video, infoTable)
     })
     .catch(error => {
         console.error(error);
     });
+})
+
+setListener(webLink, 'keypress', (event) => {
+    if(event.key === 'Enter' && webLink)
+    {
+        event.preventDefault()
+        getVideo.click()
+    }
+})
+
+setListener(deleteVideo, 'click', () => {
+    console.log('Delete')
+    for (let item of selectRows())
+    {
+        if (item.className == 'videos')
+        {
+            delete videosData[item.rowIndex]
+        
+            videosData = videosData.filter(item => Object.keys(item).length !== 0)
+        }
+    }
+    renderTable(videosData, videosTable)
 })
 
 let filters = {
@@ -121,13 +153,29 @@ let filters = {
 };
 
 setListener(searchButton, 'click', async () => {
-    youtube.searchVideosWithFilters(document.getElementById("query").value, 5, filters)
+    searchData = []
+    youtube.searchVideosWithFilters(query.value, 5, filters)
     .then(videos => {
     console.log(videos);
-    searchData = videos
-    renderTable(searchData, searchTable)
+    videos.forEach(element => {
+        youtube.getVideoDetails(element.id)
+        .then(searchVideos => {
+            console.log(searchVideos[0])
+            searchData.push(searchVideos[0])
+            console.log(searchData)
+            renderTable(searchData, searchTable)
+        })
+    });
     })
     .catch(error => {
     console.error(error);
     });
+})
+
+setListener(query, 'keypress', (event) => {
+    if(event.key === 'Enter' && query)
+    {
+        event.preventDefault()
+        searchButton.click()
+    }
 })
