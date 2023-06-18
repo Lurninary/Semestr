@@ -189,6 +189,8 @@ setListener(deleteVideo, 'click', () => {
     {
         if (item.className == 'videos')
         {
+            console.log(videosData)
+            console.log(item.rowIndex)
             delete videosData[item.rowIndex - 1]
         
             videosData = videosData.filter(item => Object.keys(item).length !== 0)
