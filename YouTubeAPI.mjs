@@ -24,6 +24,7 @@ class YouTubeAPI {
     getVideoDetails(videoId) {
         const url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails,id&id=${videoId}&key=${this.apiKey}`;
         let DataArray = []
+        
         console.log(`getVideoDetails: Sending request to ${url}`);
         return fetch(url)
         .then(response => response.json())
@@ -37,28 +38,31 @@ class YouTubeAPI {
             data.items[0].statistics.viewCount,
             data.items[0].contentDetails.duration
             ))
-        return DataArray;
+
+            return DataArray;
         });
     }
 
     searchVideosWithFilters(query, maxResults, filters) {
         let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=${maxResults}&key=${this.apiKey}`;
         let DataArray = []
+
         if (filters) {
-        if (filters.orderBy) {
-            url += `&order=${filters.orderBy}`;
-        }
-        if (filters.publishedAfter) {
-            url += `&publishedAfter=${filters.publishedAfter}`;
-        }
-        if (filters.publishedBefore) {
-            url += `&publishedBefore=${filters.publishedBefore}`;
-        }
-        if (filters.videoDefinition) {
-            url += `&videoDefinition=${filters.videoDefinition}`;
-        }
+            if (filters.orderBy) {
+                url += `&order=${filters.orderBy}`;
+            }
+            if (filters.publishedAfter) {
+                url += `&publishedAfter=${filters.publishedAfter}`;
+            }
+            if (filters.publishedBefore) {
+                url += `&publishedBefore=${filters.publishedBefore}`;
+            }
+            if (filters.videoDefinition) {
+                url += `&videoDefinition=${filters.videoDefinition}`;
+            }
         }
         console.log(`searchVideosWithFilters: Sending request to ${url}`);
+
         return fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -71,7 +75,8 @@ class YouTubeAPI {
                 data.items[i].snippet.publishedAt
                 ))
             }
-        return DataArray;
+            
+            return DataArray;
         });
     }
 }

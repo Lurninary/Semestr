@@ -35,6 +35,15 @@ function renderTable(data, table)
 {
     table.innerHTML=''
     console.log("start render " + table.id)
+    let firstRow = document.createElement('tr')
+    
+    for (let attr in data[0])
+    {
+        let firstColumn = document.createElement('th')
+        firstColumn.textContent = attr
+        firstRow.appendChild(firstColumn)
+    }
+    table.appendChild(firstRow)
     for (let video of data)
     {
         let row = document.createElement('tr')
@@ -48,10 +57,10 @@ function renderTable(data, table)
                 if(item != "preview")
                 {
                     column.textContent = video[item] 
-                }else
-                {
+                }else {
                     let link = document.createElement("a")
                     link.href = 'https://www.youtube.com/watch?v=' + video.id
+                    
                     let image = document.createElement("img")
                     image.src = video[item]
                     link.appendChild(image)
@@ -61,20 +70,23 @@ function renderTable(data, table)
             }
         }
         
-        setListener(row, 'click', () => {
-            if(row.id != 'selected')
-            {
-                row.id = 'selected'
-                row.className = table.id
-                row.style.backgroundColor = 'lightblue'
-                console.log(row)
-            } else {
-                row.id = ''
-                row.className = ''
-                row.style.backgroundColor = document.getElementById('searchData').style.backgroundColor
-            }
-            
-        })
+        if(table.id != 'videoInfo')
+        {
+            setListener(row, 'click', () => {
+                if(row.id != 'selected')
+                {
+                    row.id = 'selected'
+                    row.className = table.id
+                    row.style.backgroundColor = 'lightblue'
+                    console.log(row)
+                } else {
+                    row.id = ''
+                    row.className = ''
+                    row.style.backgroundColor = document.getElementById('searchData').style.backgroundColor
+                }
+                
+            })
+        }
 
         table.appendChild(row)
     }
@@ -86,6 +98,7 @@ const setListener = (element, type, handler) => {
     {
         return
     }
+
     element.addEventListener(type, handler)
     return () => {
         element.removeEventListener(type, handler)
@@ -95,9 +108,11 @@ const setListener = (element, type, handler) => {
 
 function selectRows() {
     let selectedRows = []
+
     for (let item of document.querySelectorAll('tr'))
     {
-        if(item.id == 'selected'){
+        if(item.id == 'selected')
+        {
             selectedRows.push(item)
         } 
     }
@@ -110,12 +125,14 @@ function checkboxesInit() {
     checkboxes.forEach((checkbox) => {
         setListener(checkbox, 'click', () => {
         checkboxes.forEach((cb) => {
-            if (cb !== checkbox && cb.checked) {
+            if (cb !== checkbox && cb.checked) 
+            {
                 cb.checked = false
             }
         })
     
-        if (checkbox.checked) {
+        if (checkbox.checked) 
+        {
             filters.orderBy = checkbox.value
         }
         })
@@ -130,16 +147,21 @@ setListener(addButton, 'click', async () => {
     {
         if (item.className == "searchData")
         {
-            let searchId = searchData[item.rowIndex].id
-            youtube.getVideoDetails(searchId)
-            .then(video => {
-                console.log(video)
-                videosData.push(video[0])
-                renderTable(videosData, videosTable)
-            })
+            let searchId = searchData[item.rowIndex - 1].id
+
+            let video = await youtube.getVideoDetails(searchId)
+            console.log(video)
+            videosData.push(video[0])
             item.click()
         }
     }
+    
+    videosData = videosData.filter((item, index) => {
+        return !videosData.slice(0, index).some((prevItem) => {
+            return prevItem.id === item.id
+        })
+    })
+    renderTable(videosData, videosTable)
 });
 
 setListener(getVideo, 'click', async () => {
@@ -167,7 +189,7 @@ setListener(deleteVideo, 'click', () => {
     {
         if (item.className == 'videos')
         {
-            delete videosData[item.rowIndex]
+            delete videosData[item.rowIndex - 1]
         
             videosData = videosData.filter(item => Object.keys(item).length !== 0)
         }
@@ -180,7 +202,8 @@ setListener(searchButton, 'click', async () => {
     youtube.searchVideosWithFilters(query.value, 5, filters)
     .then(async (videos) => {
         console.log(videos);
-        for (let item of videos) {
+        for (let item of videos) 
+        {
             let searchVideos = await youtube.getVideoDetails(item.id)
             console.log(searchVideos[0])
             searchData.push(searchVideos[0])
@@ -189,7 +212,7 @@ setListener(searchButton, 'click', async () => {
         renderTable(searchData, searchTable)
     })
     .catch(error => {
-    console.error(error);
+        console.error(error);
     });
 })
 
