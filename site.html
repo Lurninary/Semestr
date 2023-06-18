@@ -22,7 +22,7 @@
      </style>
   </head>
   <body>
-    <div id="userName"></div>
+    <h1 id="userName"></h1>
     <form>
         <h1>Информация о видео</h1>
         <input type="text" id="link" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ" size="50">
@@ -38,6 +38,15 @@
       <table id="searchData">
         <input type="text" id="query" value='' size="50">
         <input type="button" id="search_button" value="Поиск">
+        <div>
+          Параметры сортировки:
+          <input type="checkbox" id="dateFilter" value="date">
+          <label for="dateFilter">Дата создания</label>
+          <input type="checkbox" id="ratingFilter" value="rating">
+          <label for="ratingFilter">Рейтинг</label>
+          <input type="checkbox" id="viewCountFilter" value="viewCount">
+          <label for="viewCountFilter">Количество просмотров</label>
+        </div>
         <button type="button" id="addButton">Добавить</button>
       </table>
     </form>

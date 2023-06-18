@@ -1,4 +1,4 @@
-import { YouTubeAPI, YouTubeVideo } from "./YouTubeAPI.mjs"
+import { YouTubeAPI } from "./YouTubeAPI.mjs"
 
 const apiKey = 'AIzaSyCXAv-2ZqSYc3BCF0ZL04t3ynrnrECTkQ0'
 const youtube = new YouTubeAPI(apiKey);
@@ -12,14 +12,24 @@ const webLink = document.getElementById('link')
 const searchButton = document.getElementById('search_button')
 const getVideo = document.getElementById('get_video')
 const deleteVideo = document.getElementById('deleteButton')
-const query = document.getElementById("query")
+const query = document.getElementById('query')
 const addButton = document.getElementById('addButton')
+
+const dateCb = document.getElementById('dateFilter')
+const ratingCb = document.getElementById('ratingFilter')
+const viewCountCb = document.getElementById('viewCountFilter')
 
 let name = prompt("Привет! Как вас зовут?")
 docTitle.textContent = "Привет, " + name + "!";
 
 let videosData = []
 let searchData = []
+let filters = {
+    type: "video",
+    orderBy: "",
+    videoDefinition: "high",
+    videoEmbeddable: "true"
+};
 
 function renderTable(data, table)
 {
@@ -83,7 +93,7 @@ const setListener = (element, type, handler) => {
     
 }
 
-function selectRows(tableId) {
+function selectRows() {
     let selectedRows = []
     for (let item of document.querySelectorAll('tr'))
     {
@@ -93,6 +103,26 @@ function selectRows(tableId) {
     }
     return selectedRows
 }
+
+function checkboxesInit() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    
+    checkboxes.forEach((checkbox) => {
+        setListener(checkbox, 'click', () => {
+        checkboxes.forEach((cb) => {
+            if (cb !== checkbox && cb.checked) {
+                cb.checked = false
+            }
+        })
+    
+        if (checkbox.checked) {
+            filters.orderBy = checkbox.value
+        }
+        })
+    })
+}
+
+checkboxesInit()
 
 setListener(addButton, 'click', async () => {
     console.log('Add')
@@ -145,27 +175,18 @@ setListener(deleteVideo, 'click', () => {
     renderTable(videosData, videosTable)
 })
 
-let filters = {
-    type: "video",
-    orderBy: "viewCount",
-    videoDefinition: "high",
-    videoEmbeddable: "true"
-};
-
 setListener(searchButton, 'click', async () => {
     searchData = []
     youtube.searchVideosWithFilters(query.value, 5, filters)
-    .then(videos => {
-    console.log(videos);
-    videos.forEach(element => {
-        youtube.getVideoDetails(element.id)
-        .then(searchVideos => {
+    .then(async (videos) => {
+        console.log(videos);
+        for (let item of videos) {
+            let searchVideos = await youtube.getVideoDetails(item.id)
             console.log(searchVideos[0])
             searchData.push(searchVideos[0])
             console.log(searchData)
-            renderTable(searchData, searchTable)
-        })
-    });
+        }
+        renderTable(searchData, searchTable)
     })
     .catch(error => {
     console.error(error);
