@@ -1,6 +1,7 @@
 import { YouTubeAPI } from "./YouTubeAPI.mjs"
+import YTAPIKEY from Utils.mjs
 
-const apiKey = 'AIzaSyCXAv-2ZqSYc3BCF0ZL04t3ynrnrECTkQ0'
+const apiKey = YTAPIKEY
 const youtube = new YouTubeAPI(apiKey);
 
 const videosTable = document.getElementById('videos')
